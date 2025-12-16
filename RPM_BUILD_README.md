@@ -1,6 +1,6 @@
-# Create Icon Files RPM Packaging Guide
+# Image Inpainter RPM Packaging Guide
 
-This document details the process, prerequisites, and structure for packaging the **Create Icon Files** application as an RPM for Fedora/RHEL-based systems.
+This document details the process, prerequisites, and structure for packaging the **Image Inpainter** application as an RPM for Fedora/RHEL-based systems.
 
 ## CRITICAL: Naming Conventions (READ THIS FIRST)
 
@@ -8,27 +8,27 @@ This document details the process, prerequisites, and structure for packaging th
 
 The Linux Software Center relies on a strict link between the AppStream Metadata, the Desktop File, and the Icon.
 
-1.  **RDNN Format Required:** Use Reverse Domain Name Notation (e.g., `com.wheelhouser.create_icon_files`).
+1.  **RDNN Format Required:** Use Reverse Domain Name Notation (e.g., `com.wheelhouser.image_inpainter`).
 2.  **NO HYPHENS in ID:** The App ID component must use **underscores** (`_`), not hyphens. Hyphens trigger validation errors (`cid-rdns-contains-hyphen`) that break the build.
-    *   **BAD:** `com.wheelhouser.create-icon-files`
-    *   **GOOD:** `com.wheelhouser.create_icon_files`
+    *   **BAD:** `com.wheelhouser.image-inpainter`
+    *   **GOOD:** `com.wheelhouser.image_inpainter`
 3.  **Exact Filename Matching:**
-    *   **Desktop File:** `com.wheelhouser.create_icon_files.desktop`
-    *   **Metainfo File:** `com.wheelhouser.create_icon_files.metainfo.xml`
-    *   **Icon File:** `com.wheelhouser.create_icon_files.png`
+    *   **Desktop File:** `com.wheelhouser.image_inpainter.desktop`
+    *   **Metainfo File:** `com.wheelhouser.image_inpainter.metainfo.xml`
+    *   **Icon File:** `com.wheelhouser.image_inpainter.png`
 4.  **The ID Tag MUST Include Suffix:**
     Inside the `.metainfo.xml` file, the `<id>` tag must match the desktop filename **exactly**, including the `.desktop` extension.
     ```xml
     <!-- CORRECT -->
-    <id>com.wheelhouser.create_icon_files.desktop</id>
+    <id>com.wheelhouser.image_inpainter.desktop</id>
     
     <!-- INCORRECT (Will break Software Center link) -->
-    <id>com.wheelhouser.create_icon_files</id>
+    <id>com.wheelhouser.image_inpainter</id>
     ```
 5.  **Icon Reference:**
     The `.desktop` file must refer to the icon by its full RDNN name (without extension):
     ```ini
-    Icon=com.wheelhouser.create_icon_files
+    Icon=com.wheelhouser.image_inpainter
     ```
 
 ---
@@ -53,9 +53,9 @@ The build script automatically attempts to install dependencies using `dnf`. You
 ## Project Structure
 
 *   **`build-rpm.sh`**: The main orchestration script.
-*   **`create-icon-files.spec`**: The RPM specification file defining dependencies and installation paths.
-*   **`com.wheelhouser.create_icon_files.desktop`**: System menu integration file.
-*   **`com.wheelhouser.create_icon_files.metainfo.xml`**: AppStream metadata for software center visibility.
+*   **`image_inpainter.spec`**: The RPM specification file defining dependencies and installation paths.
+*   **`com.wheelhouser.image_inpainter.desktop`**: System menu integration file.
+*   **`com.wheelhouser.image_inpainter.metainfo.xml`**: AppStream metadata for software center visibility.
 *   **`build_pyinstaller.sh`**: Script referenced to compile the Python code into a binary using PyInstaller.
 
 ## The Build Process
@@ -69,7 +69,7 @@ To build the RPM, run the script from the project root:
 ### Workflow Breakdown
 
 1.  **Version Management**:
-    *   Updates the `Version` in `create-icon-files.spec`.
+    *   Updates the `Version` in `image_inpainter.spec`.
     *   Auto-increments the `Release` number in the spec file to ensure upgrade paths work correctly.
 
 2.  **Pre-Build Validation**:
@@ -96,7 +96,7 @@ To build the RPM, run the script from the project root:
     ```
 
 ### Build fails on "cid-rdns-contains-hyphen"
-You are using hyphens in your App ID (e.g., `create-icon-files`). Rename your files and ID to use underscores (`create_icon_files`).
+You are using hyphens in your App ID (e.g., `com.wheelhouser.image-inpainter`). Rename your files and ID to use underscores (`com.wheelhouser.image_inpainter`).
 
 ## Validation Tools
 
@@ -121,29 +121,29 @@ You can also run the standard Linux validation tools manually:
 
 **Validate Desktop File:**
 ```bash
-desktop-file-validate com.wheelhouser.create_icon_files.desktop
+desktop-file-validate com.wheelhouser.image_inpainter.desktop
 ```
 
 **Validate AppStream Metadata:**
 ```bash
-appstreamcli validate com.wheelhouser.image_remove_background.metainfo.xml
+appstreamcli validate com.wheelhouser.image_inpainter.metainfo.xml
 ```
 
 4.  **Source Preparation**:
     *   Creates a clean build environment in `build/rpm-source`.
-    *   Bundles the binary, assets, desktop file, metadata, and license into a tarball (`image-resizer-0.3.0.tar.gz`).
+    *   Bundles the binary, assets, desktop file, metadata, and license into a tarball (`image-inpainter-0.3.0.tar.gz`).
     *   This tarball serves as `Source0` for the RPM build.
 
 5.  **RPM Build**:
     *   Sets up a local `rpmbuild` directory structure (`BUILD`, `RPMS`, `SOURCES`, etc.).
     *   Runs `rpmbuild -ba` using the generated tarball and the spec file.
 
-## RPM Specification Details (`image-resizer.spec`)
+## RPM Specification Details (`image-inpainter.spec`)
 
 The spec file handles the installation logic on the end-user's system.
 
-*   **Binary Placement**: The main binary is installed to `%{_libexecdir}/image-resizer/` (e.g., `/usr/libexec/image-resizer/`) to keep it private and separate from user commands.
-*   **Wrapper Script**: A shell script is created at `%{_bindir}/image-resizer` (e.g., `/usr/bin/image-resizer`) to launch the application with specific environment variables:
+*   **Binary Placement**: The main binary is installed to `%{_libexecdir}/image-inpainter/` (e.g., `/usr/libexec/image-inpainter/`) to keep it private and separate from user commands.
+*   **Wrapper Script**: A shell script is created at `%{_bindir}/image-inpainter` (e.g., `/usr/bin/image-inpainter`) to launch the application with specific environment variables:
     *   `GTK_THEME=Adwaita:dark`: Forces dark mode for native dialogs.
     *   `GTK_USE_PORTAL=1`: Requests modern file chooser portals (better view settings retention).
     *   `QT_QPA_PLATFORMTHEME=gtk3`: Ensures Qt uses GTK3 theming for consistency.
@@ -164,7 +164,7 @@ To enable signing, you must have a GPG key configured in your `~/.rpmmacros` fil
 ```
 
 If configured, the script will:
-1.  Export your public key to a temporary file `RPM-GPG-KEY-image-resizer`.
+1.  Export your public key to a temporary file `RPM-GPG-KEY-image-inpainter`.
 2.  Import it into the local RPM database (requires `sudo`).
 3.  Sign both the Binary and Source RPMs using `rpm --addsign`.
 4.  Verify the signature immediately after signing.
@@ -173,19 +173,19 @@ If configured, the script will:
 
 Upon success, the artifacts are copied to the `dist/` directory in the project root:
 
-*   **Binary RPM**: `dist/image-resizer-0.3.0-<release>.<arch>.rpm`
-*   **Source RPM**: `dist/image-resizer-0.3.0-<release>.src.rpm`
+*   **Binary RPM**: `dist/image-inpainter-0.3.0-<release>.<arch>.rpm`
+*   **Source RPM**: `dist/image-inpainter-0.3.0-<release>.src.rpm`
 
 ## Installation
 
 To install the resulting package on a Fedora/RHEL system:
 
 ```bash
-sudo dnf install dist/image-resizer-0.3.0-*.rpm
+sudo dnf install dist/image-inpainter-0.3.0-*.rpm
 ```
 
 ## Troubleshooting
 
 *   **"rpmbuild not found"**: Ensure you have installed the `rpm-build` package.
-*   **AppStream Validation Failed**: Check `com.wheelhouser.image-resizer.metainfo.xml` for syntax errors or deprecated tags (e.g., `<developer_name>` vs `<developer>`).
+*   **AppStream Validation Failed**: Check `com.wheelhouser.image-inpainter.metainfo.xml` for syntax errors or deprecated tags (e.g., `<developer_name>` vs `<developer>`).
 *   **Signing Skipped**: Ensure `rpm-sign` is installed and `~/.rpmmacros` contains your GPG key ID.

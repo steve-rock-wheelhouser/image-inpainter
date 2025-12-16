@@ -1,9 +1,9 @@
 %global debug_package %{nil}
 
-Name:           create-icon-files
+Name:           image-inpainter
 Version:    0.1.0
-Release:    15
-Summary:        Automatically create the set of icon files for Linux, Windows, macOS, and Unix systems.
+Release:    0
+Summary:        Image inpainting application for removing objects from images.
 
 License:        GPLv3
 URL:            https://wheelhouser.com
@@ -15,8 +15,7 @@ Requires:       hicolor-icon-theme
 Requires:       gtk3
 
 %description
-Create Icon Files is a desktop application for quickly and accurately creating
-icon files from images. It provides a one-click workflow to generate all necessary icon files.
+Image Inpainter is a desktop application for removing unwanted objects from images using advanced AI techniques. It provides an easy-to-use interface for inpainting images.
 
 %prep
 %setup -q
@@ -29,7 +28,7 @@ rm -rf %{buildroot}
 
 # Install binary to libexec (private directory)
 install -d -m 755 %{buildroot}%{_libexecdir}/%{name}
-install -m 755 create-icon-files.bin %{buildroot}%{_libexecdir}/%{name}/%{name}
+install -m 755 image-inpainter.bin %{buildroot}%{_libexecdir}/%{name}/%{name}
 
 # Install assets
 cp -r assets %{buildroot}%{_libexecdir}/%{name}/
@@ -46,17 +45,17 @@ chmod 755 %{buildroot}%{_bindir}/%{name}
 
 # Install desktop file
 install -d -m 755 %{buildroot}%{_datadir}/applications
-desktop-file-install --dir=%{buildroot}%{_datadir}/applications com.wheelhouser.create_icon_files.desktop
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications com.wheelhouser.image_inpainter.desktop
 
 # Install AppStream metadata
 install -d -m 755 %{buildroot}%{_metainfodir}
-install -m 644 com.wheelhouser.create_icon_files.metainfo.xml %{buildroot}%{_metainfodir}/
+install -m 644 com.wheelhouser.image_inpainter.metainfo.xml %{buildroot}%{_metainfodir}/
 
 # Install Icon
 install -d -m 755 %{buildroot}%{_datadir}/icons/hicolor/256x256/apps
-install -m 644 assets/icons/icon.png %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/com.wheelhouser.create_icon_files.png
+install -m 644 assets/icons/icon.png %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/com.wheelhouser.image_inpainter.png
 install -d -m 755 %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
-install -m 644 assets/icons/icon.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/com.wheelhouser.create_icon_files.svg
+install -m 644 assets/icons/icon.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/com.wheelhouser.image_inpainter.svg
 
 %files
 %{_bindir}/%{name}
@@ -80,17 +79,6 @@ fi
 gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %changelog
-* Tue Dec 16 2025 Wheelhouser LLC <steve.rock@wheelhouser.com> - 0.1.0-15
-- Automated build
-* Tue Dec 16 2025 Wheelhouser LLC <steve.rock@wheelhouser.com> - 0.1.0-14
-- Automated build
-* Tue Dec 16 2025 Wheelhouser LLC <steve.rock@wheelhouser.com> - 0.1.0-12
-- Automated build
-* Mon Dec 15 2025 Wheelhouser LLC <steve.rock@wheelhouser.com> - 0.1.0-11
-- Automated build
-* Mon Dec 15 2025 Wheelhouser LLC <steve.rock@wheelhouser.com> - 0.1.0-9
-- Automated build
-* Mon Dec 15 2025 Wheelhouser LLC <steve.rock@wheelhouser.com> - 0.1.0-8
-- Automated build
-* Tue Feb 25 2025 Wheelhouser LLC <steve.rock@wheelhouser.com> - 0.1.0-1
+* Tue Dec 16 2025 Wheelhouser LLC <steve.rock@wheelhouser.com> - 0.1.0-1
 - Initial package
+

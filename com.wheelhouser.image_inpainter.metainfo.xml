@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.wheelhouser.create_icon_files.desktop</id>
+  <id>com.wheelhouser.image_inpainter.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0</project_license>
 
-  <name>Create Icon Files</name>
-  <summary>Automatically create the set of icon files for Linux, Windows, macOS, and Unix systems.</summary>
+  <name>Image Inpainter</name>
+  <summary>Remove unwanted objects from images using AI-powered inpainting.</summary>
 
   <description>
     <p>
-      Create Icon Files is a desktop application for quickly and accurately creating
-      icon files from images. It provides a one-click workflow to generate all necessary icon files. 
-      The application is designed for graphic designers, developers, and content creators who need to generate
-      application icons in various sizes and formats.
+      Image Inpainter is a desktop application for removing unwanted objects from images using advanced AI techniques. It provides an easy-to-use interface for inpainting images with high accuracy.
+      The application is designed for photographers, designers, and content creators who need to clean up images.
     </p>
     <p>
       Key features:
     </p>
     <ul>
-      <li>Output icon files for Linux, Windows, macOS, and Unix systems</li>
-      <li>icon.ico, icon.icns, icon.png, icon.svg, and the set of Linux icon files 16x16 to 512x512</li>
+      <li>AI-powered object removal and inpainting</li>
+      <li>Batch processing multiple images</li>
+      <li>User-friendly graphical interface</li>
     </ul>
     <p>
       The tool is optimized for accuracy and speed on modern desktops and can be used
@@ -27,10 +26,10 @@
     </p>
   </description>
 
-  <launchable type="desktop-id">com.wheelhouser.create_icon_files.desktop</launchable>
+  <launchable type="desktop-id">com.wheelhouser.image_inpainter.desktop</launchable>
 
   <provides>
-    <binary>create-icon-files</binary>
+    <binary>image-inpainter</binary>
   </provides>
 
   <developer id="com.wheelhouser">
@@ -49,8 +48,8 @@
   </keywords>
 
   <url type="homepage">https://wheelhouser.com</url>
-  <url type="bugtracker">https://github.com/steve-rock-wheelhouser/create-icon-files/issues</url>
-  <url type="vcs-browser">https://github.com/steve-rock-wheelhouser/create-icon-files</url>
+  <url type="bugtracker">https://github.com/steve-rock-wheelhouser/image-inpainter/issues</url>
+  <url type="vcs-browser">https://github.com/steve-rock-wheelhouser/image-inpainter</url>
 
   <content_rating type="oars-1.1">
     <content_attribute id="violence-cartoon">none</content_attribute>
@@ -76,24 +75,24 @@
   <screenshots>
     <screenshot type="default">
       <caption xml:lang="en">Main window showing preview and tools</caption>
-      <image>https://raw.githubusercontent.com/steve-rock-wheelhouser/create-icon-files/main/assets/screenshots/screenshot.png</image>
+      <image>https://raw.githubusercontent.com/steve-rock-wheelhouser/image-inpainter/main/assets/screenshots/screenshot.png</image>
     </screenshot>
     <screenshot>
       <caption xml:lang="en">Batch processing multiple images</caption>
-      <image>https://raw.githubusercontent.com/steve-rock-wheelhouser/create-icon-files/main/assets/screenshots/screenshot-01.png</image>
+      <image>https://raw.githubusercontent.com/steve-rock-wheelhouser/image-inpainter/main/assets/screenshots/screenshot-01.png</image>
     </screenshot>
     <screenshot>
       <caption xml:lang="en">Optional feather and edge smoothing controls</caption>
-      <image>https://raw.githubusercontent.com/steve-rock-wheelhouser/create-icon-files/main/assets/screenshots/screenshot-02.png</image>
+      <image>https://raw.githubusercontent.com/steve-rock-wheelhouser/image-inpainter/main/assets/screenshots/screenshot-02.png</image>
     </screenshot>
   </screenshots>
 
   <releases>
     <release version="0.1.0" date="2025-12-14">
       <description>
-        <p xml:lang="en">Initial release: one-click background removal, batch mode, and CLI support.</p>
+        <p xml:lang="en">Initial release: AI-powered object removal, batch mode, and user-friendly interface.</p>
       </description>
-      <url>https://github.com/steve-rock-wheelhouser/create-icon-files/releases/tag/v0.1.0</url>
+      <url>https://github.com/steve-rock-wheelhouser/image-inpainter/releases/tag/v0.1.0</url>
     </release>
   </releases>
 

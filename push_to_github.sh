@@ -3,10 +3,10 @@ set -euo pipefail
 
 # Usage: ./push_to_github.sh "Commit message" [branch]
 # Environment overrides:
-#   GIT_REMOTE_URL - remote repository URL (default: https://github.com/steve-rock-wheelhouser/create-icon-files.git)
+#   GIT_REMOTE_URL - remote repository URL (default: https://github.com/steve-rock-wheelhouser/image-inpainter.git)
 #   REMOTE_NAME    - remote name to use (default: origin)
 # Example:
-#   GIT_REMOTE_URL="git@github.com:steve-rock-wheelhouser/create-icon-files.git" ./push_to_github.sh "Initial commit" main
+#   GIT_REMOTE_URL="git@github.com:steve-rock-wheelhouser/image-inpainter.git" ./push_to_github.sh "Initial commit" main
 
 if [ $# -lt 1 ]; then
     echo "Error: Please provide a commit message."
@@ -20,7 +20,7 @@ BRANCH_RAW="${2:-$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)}"
 # Sanitize branch: take first line and remove CR/LF characters to avoid invalid refspecs
 BRANCH="$(printf '%s' "$BRANCH_RAW" | sed -n '1p' | tr -d '\r' | tr -d '\n')"
 REMOTE_NAME="${REMOTE_NAME:-origin}"
-REMOTE_URL="${GIT_REMOTE_URL:-https://github.com/steve-rock-wheelhouser/create-icon-files.git}"
+REMOTE_URL="${GIT_REMOTE_URL:-https://github.com/steve-rock-wheelhouser/image-inpainter.git}"
 
 init_repo_if_needed() {
     if ! git rev-parse --git-dir >/dev/null 2>&1; then

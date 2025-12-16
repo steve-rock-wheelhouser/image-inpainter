@@ -14,13 +14,13 @@ echo "--- Building with PyInstaller ---"
 # --add-data: Bundle the assets folder (format is source:dest)
 # --collect-all: Aggressively collect all files for cairo libraries to prevent missing imports
 pyinstaller --noconfirm --onefile --windowed \
-    --name "create_icon_files" \
+    --name "image_inpainter" \
     --icon "assets/icons/icon.png" \
     --add-data "assets:assets" \
     --hidden-import "cairosvg" \
     --hidden-import "cairocffi" \
     --collect-all "cairosvg" \
     --collect-all "cairocffi" \
-    create_icon_files.py
+    image_inpainter.py
 
-echo "--- Success! Binary created: dist/create_icon_files ---"
+echo "--- Success! Binary created: dist/image_inpainter ---"

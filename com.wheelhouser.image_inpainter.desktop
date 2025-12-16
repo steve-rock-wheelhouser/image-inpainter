@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Image Inpainter
+GenericName=Image Editor
+Comment=Remove unwanted objects from images using AI-powered inpainting
+Exec=image-inpainter %F
+TryExec=image-inpainter
+Icon=com.wheelhouser.image_inpainter
+Terminal=false
+Categories=Graphics;
+StartupNotify=true
+StartupWMClass=image-inpainter
+MimeType=image/png;image/jpeg;image/webp;image/svg+xml;image/tiff;image/bmp;
+Keywords=image;edit;remove;background;photo;inpainting;ai;

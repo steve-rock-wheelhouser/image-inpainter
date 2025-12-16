@@ -14,7 +14,6 @@ garbage/
 build/
 dist/
 rpmbuild/
-create_icon_files.spec
 *.bin
 
 # Logs and Metadata

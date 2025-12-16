@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-APP_NAME="create-icon-files"
+APP_NAME="image-inpainter"
 VERSION="0.1.0"
 
 # Auto-increment Release (Resets if VERSION changes)
@@ -18,7 +18,7 @@ echo "$VERSION $RELEASE" > "$RELEASE_FILE"
 
 ARCH="x86_64"
 # BINARY_NAME="${APP_NAME}.bin"
-BINARY_NAME="create_icon_files"
+BINARY_NAME="image_inpainter"
 
 SIGN_RPMS="1"
 GPG_KEY="8CC02D3C" # Run 'gpg --list-keys' and paste your new Wheelhouser LLC Key ID here
@@ -36,7 +36,7 @@ NEED_BUILD=0
 if [ ! -f "$DIST_BIN" ]; then
     echo "Binary missing. Building..."
     NEED_BUILD=1
-elif [ "create_icon_files.py" -nt "$DIST_BIN" ]; then
+elif [ "image_inpainter.py" -nt "$DIST_BIN" ]; then
     echo "Source code changed. Rebuilding..."
     NEED_BUILD=1
 elif [ -n "$(find assets -newer "$DIST_BIN" -print -quit 2>/dev/null)" ]; then
@@ -45,8 +45,8 @@ elif [ -n "$(find assets -newer "$DIST_BIN" -print -quit 2>/dev/null)" ]; then
 fi
 
 if [ "$NEED_BUILD" -eq 1 ]; then
-    chmod +x build_pyinstaller.sh
-    ./build_pyinstaller.sh
+    chmod +x compile.sh
+    ./compile.sh
 else
     echo "Binary is up to date. Skipping compilation."
 fi
@@ -66,22 +66,22 @@ mkdir -p $RPMBUILD_DIR/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 # Copy project sources that the spec expects into SOURCES so rpmbuild can access them
 echo "--- Preparing SOURCES ---"
-SOURCE_DIR="create-icon-files-${VERSION}"
+SOURCE_DIR="image-inpainter-${VERSION}"
 rm -rf "build/${SOURCE_DIR}"
 mkdir -p "build/${SOURCE_DIR}"
 
 # Copy files to source dir
-cp -f "${PWD}/com.wheelhouser.create_icon_files.desktop" "build/${SOURCE_DIR}/"
+cp -f "${PWD}/com.wheelhouser.image_inpainter.desktop" "build/${SOURCE_DIR}/"
 
 # Copy LICENSE so the spec can install it
 cp -f "${PWD}/LICENSE" "build/${SOURCE_DIR}/"
 
 # Copy AppStream metadata and normalize filename to .metainfo.xml (AppStream standard)
-if [ -f "${PWD}/com.wheelhouser.create_icon_files.metainfo.xml" ]; then
-    cp -f "${PWD}/com.wheelhouser.create_icon_files.metainfo.xml" "build/${SOURCE_DIR}/com.wheelhouser.create_icon_files.metainfo.xml"
+if [ -f "${PWD}/com.wheelhouser.image_inpainter.metainfo.xml" ]; then
+    cp -f "${PWD}/com.wheelhouser.image_inpainter.metainfo.xml" "build/${SOURCE_DIR}/com.wheelhouser.image_inpainter.metainfo.xml"
 fi
 if [ -f "${PWD}/dist/${BINARY_NAME}" ]; then
-    cp -f "${PWD}/dist/${BINARY_NAME}" "build/${SOURCE_DIR}/create-icon-files.bin"
+    cp -f "${PWD}/dist/${BINARY_NAME}" "build/${SOURCE_DIR}/image-inpainter.bin"
 fi
 
 # Copy the ENTIRE assets folder (Icons, Models, Everything)
@@ -89,7 +89,7 @@ cp -r "${PWD}/assets" "build/${SOURCE_DIR}/"
 
 # Create Tarball
 echo "--- Creating Source Tarball ---"
-tar -czf "$RPMBUILD_DIR/SOURCES/create-icon-files-${VERSION}.tar.gz" -C build "${SOURCE_DIR}"
+tar -czf "$RPMBUILD_DIR/SOURCES/image-inpainter-${VERSION}.tar.gz" -C build "${SOURCE_DIR}"
 
 
 # Validate AppStream metadata
@@ -98,12 +98,12 @@ if ! command -v appstreamcli &> /dev/null; then
     echo "Warning: 'appstreamcli' is not installed. Skipping metadata validation."
 else
     # Validate the copied/normalized metainfo inside the source dir if present
-    if [ -f "build/${SOURCE_DIR}/com.wheelhouser.create_icon_files.metainfo.xml" ]; then
+    if [ -f "build/${SOURCE_DIR}/com.wheelhouser.image_inpainter.metainfo.xml" ]; then
         echo "--- DEBUG: Checking ID in metainfo before packaging ---"
-        grep "<id>" "build/${SOURCE_DIR}/com.wheelhouser.create_icon_files.metainfo.xml"
+        grep "<id>" "build/${SOURCE_DIR}/com.wheelhouser.image_inpainter.metainfo.xml"
         echo "-------------------------------------------------------"
 
-        appstreamcli validate "build/${SOURCE_DIR}/com.wheelhouser.create_icon_files.metainfo.xml" || {
+        appstreamcli validate "build/${SOURCE_DIR}/com.wheelhouser.image_inpainter.metainfo.xml" || {
             echo "AppStream metadata validation failed. Please fix the errors above."; exit 1; }
     else
         echo "No metainfo found in build source dir; skipping validation."
@@ -113,7 +113,7 @@ fi
 # Validate Desktop File
 echo "--- Validating Desktop File ---"
 if command -v desktop-file-validate &> /dev/null; then
-    desktop-file-validate "build/${SOURCE_DIR}/com.wheelhouser.create_icon_files.desktop" || {
+    desktop-file-validate "build/${SOURCE_DIR}/com.wheelhouser.image_inpainter.desktop" || {
         echo "Desktop file validation failed."; exit 1; }
 else
     echo "Warning: 'desktop-file-validate' not found. Skipping validation."
@@ -124,22 +124,22 @@ fi
 echo "--- Building RPM ---"
 
 # Ensure changelog exists to avoid warnings
-if ! grep -q "%changelog" create-icon-files.spec; then
-    echo -e "\n%changelog" >> create-icon-files.spec
+if ! grep -q "%changelog" image-inpainter.spec; then
+    echo -e "\n%changelog" >> image-inpainter.spec
 fi
 
 # Add new changelog entry for this build
 DATE_STR=$(date "+%a %b %d %Y")
-sed -i "/%changelog/a * $DATE_STR Wheelhouser LLC <steve.rock@wheelhouser.com> - ${VERSION}-${RELEASE}\\n- Automated build" create-icon-files.spec
+sed -i "/%changelog/a * $DATE_STR Wheelhouser LLC <steve.rock@wheelhouser.com> - ${VERSION}-${RELEASE}\\n- Automated build" image-inpainter.spec
 
 # Update Version and Release in spec file
-sed -i "s/^Version:[[:space:]]*.*/Version:    ${VERSION}/" create-icon-files.spec
-sed -i "s/^Release:[[:space:]]*.*/Release:    ${RELEASE}/" create-icon-files.spec
+sed -i "s/^Version:[[:space:]]*.*/Version:    ${VERSION}/" image-inpainter.spec
+sed -i "s/^Release:[[:space:]]*.*/Release:    ${RELEASE}/" image-inpainter.spec
 
 rpmbuild -ba \
     --define "_topdir $RPMBUILD_DIR" \
     --define "__os_install_post %{nil}" \
-    create-icon-files.spec
+    image-inpainter.spec
 
 echo "--- Done! RPMs located at: ---"
 find $RPMBUILD_DIR/RPMS -name "*.rpm"
