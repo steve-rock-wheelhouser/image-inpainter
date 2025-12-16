@@ -37,7 +37,7 @@ import cv2
 import numpy as np
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                                QHBoxLayout, QPushButton, QLabel, QFileDialog, 
-                               QSpinBox, QFormLayout, QFrame, QMessageBox, QGridLayout)
+                               QSpinBox, QFormLayout, QFrame, QMessageBox, QGridLayout, QSizePolicy)
 from PySide6.QtGui import QPixmap, QImage, QIcon
 from PySide6.QtCore import Qt, QEvent
 import os
@@ -57,80 +57,107 @@ def resource_path(relative_path):
 # --- Dark Mode Stylesheet ---
 #=====================================================================================================
 DARK_STYLESHEET = """
-    QMainWindow {{
-        background-color: #2E2F30;
-    }}
-    QWidget {{
-        background-color: #2E2F30;
-        color: #E0E0E0;
-        font-family: Arial, sans-serif;
-    }}
-    QLabel {{
-        font-size: 14px;
-        font-weight: bold;
-        border: none;
-        padding: 5px;
-    }}
-    QLabel#ImageLabel {{
-        border: 2px dashed #4A4B4C;
-        background-color: #252627;
-        min-height: 300px;
-        min-width: 400px;
-    }}
-    QPushButton {{
-        background-color: #4A4B4C;
-        color: #E0E0E0;
-        border: 1px solid #636465;
-        border-radius: 5px;
-        padding: 8px 16px;
-        font-size: 14px;
-    }}
-    QPushButton:hover {{
-        background-color: #636465;
-        border: 1px solid #7A7B7C;
-    }}
-    QPushButton:pressed {{
-        background-color: #252627;
-    }}
-    QPushButton:disabled {{
-        background-color: #3A3B3C;
-        color: #7A7B7C;
-    }}
-    QSpinBox {{
-        background-color: #3A3B3C;
-        border: 1px solid #636465;
-        border-radius: 4px;
-        padding: 5px;
-        font-size: 14px;
-    }}
-    QFrame#Separator {{
-        background-color: #4A4B4C;
-    }}
-    QSpinBox::up-button {{
-        subcontrol-origin: padding;
-        subcontrol-position: top right;
-        width: 15px;
-        border-left: 1px solid #636465;
-    }}
-    QSpinBox::down-button {{
-        subcontrol-origin: padding;
-        subcontrol-position: bottom right;
-        width: 15px;
-        border-left: 1px solid #636465;
-    }}
-    QSpinBox::up-button:hover, QSpinBox::down-button:hover {{
-        background-color: #4A4B4C;
-    }}
-    QSpinBox::up-arrow {{
-        image: url({UP_ARROW_PATH});
-        width: 7px;
-        height: 7px;
-    }}
-    QSpinBox::down-arrow {{
-        image: url({DOWN_ARROW_PATH});
-        width: 7px;
-        height: 7px;
-    }}
+            QWidget {
+                background-color: #1e1e1e;
+                color: #ffffff;
+                font-family: "Segoe UI", "Arial", sans-serif;
+                font-size: 14px;
+            }
+            QLabel {
+                font-size: 14px;
+                font-weight: bold;
+                border: none;
+                padding: 5px;
+            }
+            QLabel#ImageLabel {
+                border: 2px dashed #4A4B4C;
+                background-color: #252627;
+                min-height: 300px;
+                min-width: 400px;
+            }
+            #header_widget {
+                background-color: #1e1e1e;
+                border-bottom: 1px solid #1e1e1e;
+            }
+            QPushButton {
+                background-color: #323232;
+                border: 1px solid #555;
+                border-radius: 4px;
+                padding: 6px;
+                icon-size: 0px;
+            }
+            QPushButton:hover {
+                background-color: #424242;
+                border: 1px solid #007AFF;
+            }
+            QPushButton:disabled {
+                background-color: #1e1e1e;
+                color: #555;
+                border: 1px solid #333;
+            }
+
+            /* Specific style for the 'About' button */
+            QPushButton#aboutButton {
+                background-color: transparent;
+                border: none;
+                padding: 4px 8px;
+                color: #00BFFF;
+            }
+            /* Style for the 'About' button on mouse hover */
+            QPushButton#aboutButton:hover {
+                background-color: #444444;
+                border: none;
+                border-radius: 4px;
+            }
+            /* Style for the 'About' button when pressed */
+            QPushButton#aboutButton:pressed {
+                background-color: #333333;
+                border: none;
+            }
+            /* GroupBox Styling */
+            QGroupBox {
+                border: 1px solid #1e1e1e;
+                border-radius: 5px;
+                margin-top: 10px;
+                font-weight: normal;
+                color: #ddd;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top center;
+                padding: 0 3px 0 3px;
+            }
+
+            /* CheckBox Styling */
+            QCheckBox {
+                spacing: 5px;
+                color: #ccc;
+            }
+            /* Style for the checkbox indicator */
+            QCheckBox::indicator {
+                width: 18px;
+                height: 18px;
+            }
+
+            /* Style for the checkbox indicator when unchecked */
+            QCheckBox::indicator:unchecked {
+                background-color: #3E3E3E;
+                border: 1px solid #555555;
+                border-radius: 3px;
+            }
+
+            /* Style for the unchecked checkbox indicator on mouse hover */
+            QCheckBox::indicator:unchecked:hover {
+                border: 1px solid #007AFF;
+            }
+
+            /* Style for the checkbox indicator when checked */
+            QCheckBox::indicator:checked {
+                background-color: #007AFF;
+                border: 1px solid #007AFF;
+                border-radius: 3px;
+                image: url("{css_icon_path}");
+            }
 """
 
 #=====================================================================================================
@@ -147,14 +174,9 @@ class InpaintingApp(QMainWindow):
         self.setGeometry(100, 100, 1200, 700)
         
         # --- Prepare and set stylesheet with correct resource paths ---
-        up_arrow_path = resource_path(os.path.join("assets", "icons", "up-arrow.png")).replace('\\', '/')
-        down_arrow_path = resource_path(os.path.join("assets", "icons", "down-arrow.png")).replace('\\', '/')
-        
-        formatted_stylesheet = DARK_STYLESHEET.format(
-            UP_ARROW_PATH=up_arrow_path,
-            DOWN_ARROW_PATH=down_arrow_path
-        )
-        self.setStyleSheet(formatted_stylesheet)
+        css_icon_path = resource_path(os.path.join("assets", "icons", "custom_checkmark.png")).replace(os.sep, '/')
+
+        QApplication.instance().setStyleSheet(DARK_STYLESHEET.replace("{css_icon_path}", css_icon_path))
         
         # --- Set Window Icon using resource_path ---
         icon_path = resource_path(os.path.join("assets", "icons", "icon-image-inpainter.ico"))
@@ -182,6 +204,7 @@ class InpaintingApp(QMainWindow):
         self.save_button.setEnabled(False)
         
         self.about_button = QPushButton("About")
+        self.about_button.setObjectName("aboutButton")
         self.about_button.clicked.connect(self.show_about_dialog)
 
         top_bar_layout.addWidget(self.load_button)
@@ -198,12 +221,14 @@ class InpaintingApp(QMainWindow):
         self.original_label = QLabel("Original Image")
         self.original_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.original_label.setObjectName("ImageLabel")
+        self.original_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.original_label.setMouseTracking(True)
         self.original_label.installEventFilter(self)
         
         self.result_label = QLabel("Preview / Result")
         self.result_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.result_label.setObjectName("ImageLabel")
+        self.result_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.result_label.setMouseTracking(True)
         self.result_label.installEventFilter(self)
 
@@ -360,26 +385,6 @@ class InpaintingApp(QMainWindow):
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Could not save the image.\nError: {e}")
 
-    def show_about_dialog(self):
-        """Displays the 'About' dialog box."""
-        QMessageBox.about(self,
-            "About Image Inpainting Tool",
-            "<b>Image Inpainting Tool v1.0</b><br><br>"
-            "This application uses OpenCV to remove and reconstruct selected "
-            "portions of an image.<br><br>"
-            "A Product of Wheelhouser LLC<br>"
-            "All Rights Reserved &copy; 2025<br>"
-            "Part of the <a href='http://www.marquee-magic.com'>Marquee-Magic Designer</a> suite."
-        )
-
-    def convert_cv_to_pixmap(self, cv_img):
-        """Convert an OpenCV image to a QPixmap."""
-        rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
-        h, w, ch = rgb_image.shape
-        bytes_per_line = ch * w
-        q_image = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
-        return QPixmap.fromImage(q_image)
-
     def resizeEvent(self, event):
         """Handle window resize to scale images correctly from their source."""
         super().resizeEvent(event)
@@ -454,6 +459,40 @@ class InpaintingApp(QMainWindow):
             self.mouse_coords_label.setText(f"Mouse: ({coords[0]}, {coords[1]})")
         else:
             self.mouse_coords_label.setText("Mouse: (---, ---)")
+
+    def show_about_dialog(self):
+        """Shows the about dialog."""
+        about_dlg = QMessageBox(self)
+        about_dlg.setWindowTitle("About Image Inpainting Tool")
+
+        # Set the icon
+        icon_path = resource_path(os.path.join("assets", "icons", "icon.png"))
+        pixmap = QPixmap(icon_path)
+        if not pixmap.isNull():
+            about_dlg.setIconPixmap(pixmap.scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+
+        about_dlg.setTextFormat(Qt.RichText)
+        about_dlg.setText("<h3>Image Inpainting Tool</h3>")
+        about_dlg.setInformativeText(
+            "<div style='font-size: 14px;'>"
+            "This application uses OpenCV to remove and reconstruct selected portions of an image.<br><br>"
+            "<span style='color: #00BFFF;'>"
+            "Version 1.0<br>"
+            "</span><br>"
+            "© 2025 Wheelhouser LLC<br>"
+            "Part of the <a href='http://www.marquee-magic.com' style='color: #00BFFF;'>Marquee-Magic Designer</a> suite."
+            "</div>"
+        )
+        about_dlg.setStandardButtons(QMessageBox.Ok)
+        about_dlg.exec()
+
+    def convert_cv_to_pixmap(self, cv_img):
+        """Convert an OpenCV image to a QPixmap."""
+        rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        h, w, ch = rgb_image.shape
+        bytes_per_line = ch * w
+        q_image = QImage(rgb_image.data, w, h, bytes_per_line, QImage.Format.Format_RGB888)
+        return QPixmap.fromImage(q_image)
 
 #=====================================================================================================
 #--- Application Entry Point ---
