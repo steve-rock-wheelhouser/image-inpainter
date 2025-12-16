@@ -15,6 +15,7 @@ build/
 dist/
 rpmbuild/
 *.bin
+bin-bak/
 
 # Logs and Metadata
 crash.log
