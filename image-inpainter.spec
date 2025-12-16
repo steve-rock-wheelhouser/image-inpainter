@@ -2,7 +2,7 @@
 
 Name:           image-inpainter
 Version:    0.1.0
-Release:    0
+Release:    2
 Summary:        Image inpainting application for removing objects from images.
 
 License:        GPLv3
@@ -79,6 +79,8 @@ fi
 gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Tue Dec 16 2025 Wheelhouser LLC <steve.rock@wheelhouser.com> - 0.1.0-2
+- Automated build
 * Tue Dec 16 2025 Wheelhouser LLC <steve.rock@wheelhouser.com> - 0.1.0-1
 - Initial package
 
