@@ -19,3 +19,6 @@ pyinstaller --noconfirm --onefile --windowed \
     image_inpainter.py
 
 echo "--- Success! Binary created: dist/image_inpainter ---"
+
+# Play a notification sound (System Bell) to alert the user
+echo -e "\a"
