@@ -21,7 +21,11 @@ python -m pip install PySide6 opencv-python numpy Pillow cairosvg nuitka zstanda
 $pythonScripts = ".venv\Scripts"
 $env:Path += ";$pythonScripts"
 
+# Clean previous build artifacts to ensure fresh icon embedding
+if (Test-Path "build") { Remove-Item -Path "build" -Recurse -Force }
+if (Test-Path "dist") { Remove-Item -Path "dist" -Recurse -Force }
+
 # Build the executable with PyInstaller
-pyinstaller --name "Image Inpainter" --onefile --windowed --add-data "../assets;assets" --icon "../assets/icons/icon.ico" "../image_inpainter.py"
+pyinstaller --name "Image Inpainter" --onefile --windowed --add-data "../assets;assets" --icon "../assets/icons/icon.ico" --clean "../image_inpainter.py"
 
 Write-Host "Executable built successfully. Check the 'dist' folder for Image Inpainter.exe"

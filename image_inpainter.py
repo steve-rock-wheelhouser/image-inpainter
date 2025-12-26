@@ -189,7 +189,7 @@ class InpaintingApp(QMainWindow):
         QApplication.instance().setStyleSheet(DARK_STYLESHEET.replace("{css_icon_path}", css_icon_path))
         
         # --- Set Window Icon using resource_path ---
-        icon_path = resource_path(os.path.join("assets", "icons", "icon.ico"))
+        icon_path = resource_path(os.path.join("assets", "icons", "icon.png"))
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
         
@@ -544,6 +544,12 @@ class InpaintingApp(QMainWindow):
 #--- Application Entry Point ---
 #=====================================================================================================
 if __name__ == '__main__':
+    # Set AppUserModelID to ensure the taskbar icon is displayed correctly on Windows
+    if sys.platform == 'win32':
+        import ctypes
+        myappid = 'wheelhouser.imageinpainter.tool.0.1.0' # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
     app = QApplication(sys.argv)
     window = InpaintingApp()
     window.show()
