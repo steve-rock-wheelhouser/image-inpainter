@@ -22,6 +22,6 @@ $pythonScripts = ".venv\Scripts"
 $env:Path += ";$pythonScripts"
 
 # Build the executable with PyInstaller
-pyinstaller --onefile --windowed --add-data "../assets;assets" --icon "../assets/icons/icon.ico" "../image_inpainter.py"
+pyinstaller --name "Image Inpainter" --onefile --windowed --add-data "../assets;assets" --icon "../assets/icons/icon.ico" "../image_inpainter.py"
 
-Write-Host "Executable built successfully. Check the 'dist' folder for image_inpainter.exe"
+Write-Host "Executable built successfully. Check the 'dist' folder for Image Inpainter.exe"
