@@ -37,7 +37,7 @@ import cv2
 import numpy as np
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                                QHBoxLayout, QPushButton, QLabel, QFileDialog, 
-                               QSpinBox, QFormLayout, QFrame, QMessageBox, QGridLayout, QSizePolicy)
+                               QSpinBox, QFormLayout, QFrame, QMessageBox, QSizePolicy)
 from PySide6.QtGui import QPixmap, QImage, QIcon
 from PySide6.QtCore import Qt, QEvent, QSettings
 import os
@@ -97,10 +97,8 @@ DARK_STYLESHEET = """
             }
             QSpinBox {
                 min-width: 80px;
-                padding: 5px;
                 font-size: 14px;
             }
-
             /* Specific style for the 'About' button */
             QPushButton#aboutButton {
                 background-color: transparent;
@@ -172,8 +170,10 @@ class InpaintingApp(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.settings = QSettings("Wheelhouser LLC", "Image Inpainting Tool")
+
         self.active_result_cv_image = None # Tracks the image currently in the result panel
-        self.last_used_dir = os.path.join(os.path.expanduser("~"), "Pictures")
+        self.last_used_dir = self.settings.value("last_used_dir", os.path.join(os.path.expanduser("~"), "Pictures"), type=str)
 
         self.original_alpha = None
         self.result_alpha = None
@@ -189,7 +189,7 @@ class InpaintingApp(QMainWindow):
         QApplication.instance().setStyleSheet(DARK_STYLESHEET.replace("{css_icon_path}", css_icon_path))
         
         # --- Set Window Icon using resource_path ---
-        icon_path = resource_path(os.path.join("assets", "icons", "icon-image-inpainter.ico"))
+        icon_path = resource_path(os.path.join("assets", "icons", "icon.ico"))
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
         
@@ -212,6 +212,14 @@ class InpaintingApp(QMainWindow):
         self.save_button = QPushButton("Save Result")
         self.save_button.clicked.connect(self.save_image)
         self.save_button.setEnabled(False)
+
+        self.cancel_button = QPushButton("Undo")
+        self.cancel_button.clicked.connect(self.cancel_mask)
+        self.cancel_button.setEnabled(False)
+
+        self.execute_button = QPushButton("Execute Inpaint")
+        self.execute_button.clicked.connect(self.perform_inpainting)
+        self.execute_button.setEnabled(False)
         
         self.about_button = QPushButton("About")
         self.about_button.setObjectName("aboutButton")
@@ -221,6 +229,8 @@ class InpaintingApp(QMainWindow):
         top_bar_layout.addStretch()
         top_bar_layout.addWidget(self.image_size_label)
         top_bar_layout.addStretch()
+        top_bar_layout.addWidget(self.cancel_button)
+        top_bar_layout.addWidget(self.execute_button)
         top_bar_layout.addWidget(self.save_button)
         top_bar_layout.addWidget(self.about_button)
         main_layout.addLayout(top_bar_layout)
@@ -248,8 +258,11 @@ class InpaintingApp(QMainWindow):
         mask_and_buttons_layout = QHBoxLayout()
         mask_and_buttons_layout.setContentsMargins(10, 10, 10, 10)
         
+        self.mouse_coords_label = QLabel("Mouse: (---, ---)")
+        
         # Mask controls
-        form_layout = QFormLayout()
+        left_form = QFormLayout()
+        right_form = QFormLayout()
         self.x_spinbox = QSpinBox()
         self.y_spinbox = QSpinBox()
         self.w_spinbox = QSpinBox()
@@ -260,7 +273,7 @@ class InpaintingApp(QMainWindow):
             spinbox.setEnabled(False)
 
         # Load persistent settings
-        settings = QSettings("Wheelhouser LLC", "Image Inpainting Tool")
+        settings = self.settings
         self.w_spinbox.setValue(settings.value("mask_width", 100, type=int))
         self.h_spinbox.setValue(settings.value("mask_height", 100, type=int))
 
@@ -272,45 +285,23 @@ class InpaintingApp(QMainWindow):
         for spinbox in [self.x_spinbox, self.y_spinbox, self.w_spinbox, self.h_spinbox]:
             spinbox.valueChanged.connect(self.apply_mask_preview)
 
-        form_layout.addRow("Mask Origin X:", self.x_spinbox)
-        form_layout.addRow("Mask Origin Y:", self.y_spinbox)
-        form_layout.addRow("Mask Width:", self.w_spinbox)
-        form_layout.addRow("Mask Height:", self.h_spinbox)
+        left_form.addRow("Mask Origin X:", self.x_spinbox)
+        left_form.addRow("Mask Origin Y:", self.y_spinbox)
+        right_form.addRow("Mask Width:", self.w_spinbox)
+        right_form.addRow("Mask Height:", self.h_spinbox)
         
-        self.cancel_button = QPushButton("Undo")
-        self.cancel_button.clicked.connect(self.cancel_mask)
-        self.cancel_button.setEnabled(False)
-
-        self.execute_button = QPushButton("Execute Inpaint")
-        self.execute_button.clicked.connect(self.perform_inpainting)
-        self.execute_button.setEnabled(False)
-
-        # --- Create a button container with a grid layout to enforce equal size ---
-        button_container = QWidget()
-        button_grid = QGridLayout(button_container)
-        button_grid.setContentsMargins(0,0,0,0)
-        button_grid.addWidget(self.cancel_button, 0, 0)
-        button_grid.addWidget(self.execute_button, 0, 1)
-
-        mask_and_buttons_layout.addLayout(form_layout)
+        mask_and_buttons_layout.addLayout(left_form)
+        mask_and_buttons_layout.addLayout(right_form)
+        mask_and_buttons_layout.addWidget(self.mouse_coords_label)
         mask_and_buttons_layout.addStretch()
-        mask_and_buttons_layout.addWidget(button_container)
         
         main_layout.addLayout(mask_and_buttons_layout)
-
-        # --- Status Bar ---
-        status_bar_layout = QHBoxLayout()
-        status_bar_layout.setContentsMargins(10, 0, 10, 5)
-        self.mouse_coords_label = QLabel("Mouse: (---, ---)")
-        
-        status_bar_layout.addWidget(self.mouse_coords_label)
-        status_bar_layout.addStretch()
-        main_layout.addLayout(status_bar_layout)
 
     def load_image(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open Image", self.last_used_dir, "Image Files (*.png *.jpg *.jpeg *.bmp *.tiff *.tif *.gif)")
         if file_path:
             self.last_used_dir = os.path.dirname(file_path)
+            self.settings.setValue("last_used_dir", self.last_used_dir)
             self.original_filename = os.path.basename(file_path)
             self.original_cv_image = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
             if self.original_cv_image is None:
